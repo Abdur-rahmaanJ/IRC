@@ -26,9 +26,26 @@ class IRCBot():
             line = irc.recv(4096)
             print(line)
 
+    def messagechecker(self,msgLine):
+        completeLine = str(msgLine[1:]).split(':', 1)
+        info = completeLine[0].split()
+        message = completeLine[1].split("\\r")[0]
+        sender = info[0][2:].split("!", 1)[0]
+        #print("Complete Line-->" + str(completeLine))
+        #print("Info-->" + str(info))
+        print("\nMessage-->" + str(message))
+        print("Sender-->" + str(sender) + "\n")
+
+    def lineParser(self, chat):
+        while 1:
+            line = chat.recv(4096)
+            #print(line)
+            if line.find(bytes('PRIVMSG', 'utf-8')) != -1 or line.find(bytes('NOTICE', 'utf-8')) != -1:
+                self.messagechecker(line)
+
 
 class TwitchBot(IRCBot):
-    BOT_PASSWORD = "Password"
+    BOT_PASSWORD = "password"
 
     def connect(self):
         irc = socket.socket()
@@ -37,15 +54,12 @@ class TwitchBot(IRCBot):
         irc.send(bytes('USER jbBot jbBot jbBot : jb IRC\r\n', 'utf-8'))
         irc.send(bytes('NICK ' + self.BOT_NICKNAME + '\r\n', 'utf-8'))
         irc.send(bytes('JOIN ' + self.BOT_IRC_CHANNEL + '\r\n', 'utf-8'))
-        while 1:
-            line = irc.recv(4096)
-            print(line)
-
+        self.lineParser(irc)
 
 
 #testBot = IRCBot("irc.geekshed.net", "#bottesting", 6667)
 #testBot.printInfo()
 #testBot.connect()
 
-twitchBot = TwitchBot("irc.twitch.tv", "#jpower13", 6667)
+twitchBot = TwitchBot("irc.twitch.tv", "#kungentv", 6667)
 twitchBot.connect()
