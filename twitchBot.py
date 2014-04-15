@@ -11,7 +11,6 @@ class IRCBot():
         self.BOT_IRC_SERVER = server
         self.BOT_IRC_CHANNEL = channel
         self.BOT_IRC_PORT = port
-        self.irc = socket.socket()
 
     def connect(self):  # Connecting to the given IRC, afterwards it starts the lineParser.
         self.irc = socket.socket()
@@ -47,20 +46,41 @@ class IRCBot():
         #print("\nMessage-->" + str(message))
         #print("Sender-->" + str(sender) + "\n")
         print("%s: %s\n" % (sender, message))
-        if message[0] == '!' and sender == self.BOT_OWNER:
+        if message[0] == '!':
             messagecommand = message[1:].split()
-            if messagecommand[0].lower() == "author":
-                self.irc.send(
-                    bytes('PRIVMSG %s :I was created by %s\r\n' % (self.BOT_IRC_CHANNEL, self.BOT_OWNER), 'utf-8'))
-            elif messagecommand[0].lower() == "info":
-                self.irc.send(bytes(
-                    'PRIVMSG ' + self.BOT_IRC_CHANNEL + ' :Server: %s Channel: %s Port: %s\r\n' %
-                    (self.BOT_IRC_SERVER, self.BOT_IRC_CHANNEL, self.BOT_IRC_PORT), 'utf-8'))
-        elif message[0] == '!':
-            messagecommand = message[1:].split()
-            if messagecommand[0].lower() == "slap":
-                self.irc.send(bytes('PRIVMSG %s :%s slaps %s in the face with a big wet tuna fish, ouch!\r\n' %
-                                    (self.BOT_IRC_CHANNEL, sender, messagecommand[1]), 'utf-8'))
+            if sender == self.BOT_OWNER or sender == "j_macc":
+                if messagecommand[0].lower() == "author":
+                    self.irc.send(
+                        bytes('PRIVMSG %s :I was created by %s\r\n' % (self.BOT_IRC_CHANNEL, self.BOT_OWNER), 'utf-8'))
+                elif messagecommand[0].lower() == "info":
+                    self.irc.send(bytes(
+                        'PRIVMSG ' + self.BOT_IRC_CHANNEL + ' :Server: %s Channel: %s Port: %s\r\n' %
+                        (self.BOT_IRC_SERVER, self.BOT_IRC_CHANNEL, self.BOT_IRC_PORT), 'utf-8'))
+                elif messagecommand[0].lower() == "slap":
+                    self.irc.send(bytes('PRIVMSG %s :%s slaps %s in the face with a big wet tuna fish, ouch!\r\n' %
+                                        (self.BOT_IRC_CHANNEL, sender, messagecommand[1]), 'utf-8'))
+                elif messagecommand[0].lower() == "gear" and len(messagecommand) > 1:
+                    gearCheck = messagecommand[1].lower()
+                    if gearCheck == "helm" or gearCheck == "head" or gearCheck == "mask":
+                        self.sendmessage(self.BOT_IRC_CHANNEL, self.gear.get("head"))
+                    elif gearCheck == "ring" or gearCheck == "rings" or gearCheck == "blingbling":
+                        self.sendmessage(self.BOT_IRC_CHANNEL, self.gear.get("ring"))
+                    elif gearCheck == "chest" or gearCheck == "torso":
+                        self.sendmessage(self.BOT_IRC_CHANNEL, self.gear.get("chest"))
+                    elif gearCheck == "neck":
+                        self.sendmessage(self.BOT_IRC_CHANNEL, self.gear.get("neck"))
+                    elif gearCheck == "pants":
+                        self.sendmessage(self.BOT_IRC_CHANNEL, self.gear.get("pants"))
+                    elif gearCheck == "feet" or gearCheck == "shoes":
+                        self.sendmessage(self.BOT_IRC_CHANNEL, self.gear.get("feet"))
+                    elif gearCheck == "gloves" or gearCheck == "hands":
+                        self.sendmessage(self.BOT_IRC_CHANNEL, self.gear.get("gloves"))
+                    elif gearCheck == "shoulder" or gearCheck == "shoulders":
+                        self.sendmessage(self.BOT_IRC_CHANNEL, self.gear.get("shoulders"))
+            """else:
+                if messagecommand[0].lower() == "slap":
+                    self.irc.send(bytes('PRIVMSG %s :%s slaps %s in the face with a big wet tuna fish, ouch!\r\n' %
+                                        (self.BOT_IRC_CHANNEL, sender, messagecommand[1]), 'utf-8'))"""
 
     def sendmessage(self, rcv, msg):
         print(bytes('PRIVMSG %s :%s\r\n' % (rcv, msg), 'utf-8'))
@@ -74,7 +94,19 @@ class IRCBot():
 class TwitchBot(IRCBot):
     BOT_PASSWORD = "password"
 
+    gear = {"head": "Head 1: Zunimassa's Vision http://eu.battle.net/d3/en/item/zunimassas-vision | "
+                    "Head 2: Quetzalcoatl http://eu.battle.net/d3/en/item/quetzalcoatl",
+            "ring": "Ring 1: Stone of Jordan http://us.battle.net/d3/en/item/stone-of-jordan | "
+                    "Ring 2: Ring of Royal Grandeur http://us.battle.net/d3/en/item/ring-of-royal-grandeur-3qRFop",
+            "neck": "Neck: Golden Gorget of Leoric http://us.battle.net/d3/en/item/golden-gorget-of-leoric-1I0CCL",
+            "chest": "Chest: Helltooth Tunic http://us.battle.net/d3/en/item/helltooth-tunic",
+            "pants": "Pants: Jade Harvester's Courage http://us.battle.net/d3/en/item/jade-harvesters-courage",
+            "gloves": "Gloves: Jade Harvester's Mercy http://us.battle.net/d3/en/item/jade-harvesters-mercy",
+            "feet": "Feet: Jade Harvester's Swiftness http://us.battle.net/d3/en/item/jade-harvesters-swiftness",
+            "shoulders": "Shoulders: Jade Harvester's Joy http://us.battle.net/d3/en/item/jade-harvesters-joy"}
+
     def connect(self):
+        self.irc = socket.socket()
         self.irc.connect((self.BOT_IRC_SERVER, self.BOT_IRC_PORT))
         self.irc.send(bytes('PASS ' + self.BOT_PASSWORD + '\r\n', 'utf-8'))
         self.irc.send(bytes('USER jbBot jbBot jbBot : jb IRC\r\n', 'utf-8'))
@@ -87,7 +119,6 @@ print("==============\nSTART PROGRAM\n")
 #testBot = IRCBot("irc.geekshed.net", "#bottesting", 6667)
 #testBot.connect()
 
-twitchBot = TwitchBot("irc.twitch.tv", "#jpower13", 6667)
+twitchBot = TwitchBot("irc.twitch.tv", "#j_macc", 6667)
 twitchBot.connect()
-twitchBot.printinfo()
 print("END PROGRAM\n==============")
