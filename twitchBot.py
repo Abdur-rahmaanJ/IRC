@@ -1,6 +1,7 @@
 __author__ = 'Jeroen'
 
 import socket
+import datetime
 
 
 class IRCBot():
@@ -45,17 +46,17 @@ class IRCBot():
         #print("Info-->" + str(info))
         #print("\nMessage-->" + str(message))
         #print("Sender-->" + str(sender) + "\n")
-        print("%s: %s\n" % (sender, message))
-        if message[0] == '!':
+        messagetime = datetime.datetime.now().time().replace(microsecond=0)  # gets the time when the message was sent
+        print(
+            "[%s] %s: %s\n" % (messagetime, sender, message))  # prints all the messages "[time] sender:message" format.
+        if message[0] == '!':  # checks if the message is a command
             messagecommand = message[1:].split()
-            if sender == self.BOT_OWNER or sender == "j_macc":
+            if sender == self.BOT_OWNER or sender == self.BOT_IRC_CHANNEL[1:]:
                 if messagecommand[0].lower() == "author":
-                    self.irc.send(
-                        bytes('PRIVMSG %s :I was created by %s\r\n' % (self.BOT_IRC_CHANNEL, self.BOT_OWNER), 'utf-8'))
+                    self.irc.sendmessage(self.BOT_IRC_CHANNEL, self.BOT_OWNER)
                 elif messagecommand[0].lower() == "info":
-                    self.irc.send(bytes(
-                        'PRIVMSG ' + self.BOT_IRC_CHANNEL + ' :Server: %s Channel: %s Port: %s\r\n' %
-                        (self.BOT_IRC_SERVER, self.BOT_IRC_CHANNEL, self.BOT_IRC_PORT), 'utf-8'))
+                    self.irc.send(bytes('PRIVMSG ' + self.BOT_IRC_CHANNEL + ' :Server: %s Channel: %s Port: %s\r\n' %
+                                        (self.BOT_IRC_SERVER, self.BOT_IRC_CHANNEL, self.BOT_IRC_PORT), 'utf-8'))
                 elif messagecommand[0].lower() == "slap":
                     self.irc.send(bytes('PRIVMSG %s :%s slaps %s in the face with a big wet tuna fish, ouch!\r\n' %
                                         (self.BOT_IRC_CHANNEL, sender, messagecommand[1]), 'utf-8'))
@@ -92,18 +93,19 @@ class IRCBot():
 
 
 class TwitchBot(IRCBot):
-    BOT_PASSWORD = "password"
+    BOT_PASSWORD = "password"  # changed for obvious reasons
 
-    gear = {"head": "Head 1: Zunimassa's Vision http://eu.battle.net/d3/en/item/zunimassas-vision | "
-                    "Head 2: Quetzalcoatl http://eu.battle.net/d3/en/item/quetzalcoatl",
-            "ring": "Ring 1: Stone of Jordan http://us.battle.net/d3/en/item/stone-of-jordan | "
-                    "Ring 2: Ring of Royal Grandeur http://us.battle.net/d3/en/item/ring-of-royal-grandeur-3qRFop",
-            "neck": "Neck: Golden Gorget of Leoric http://us.battle.net/d3/en/item/golden-gorget-of-leoric-1I0CCL",
-            "chest": "Chest: Helltooth Tunic http://us.battle.net/d3/en/item/helltooth-tunic",
-            "pants": "Pants: Jade Harvester's Courage http://us.battle.net/d3/en/item/jade-harvesters-courage",
-            "gloves": "Gloves: Jade Harvester's Mercy http://us.battle.net/d3/en/item/jade-harvesters-mercy",
-            "feet": "Feet: Jade Harvester's Swiftness http://us.battle.net/d3/en/item/jade-harvesters-swiftness",
-            "shoulders": "Shoulders: Jade Harvester's Joy http://us.battle.net/d3/en/item/jade-harvesters-joy"}
+    gear = {
+        "head": "Head 1: Jade Harvester's Wisdom http://us.battle.net/d3/en/item/jade-harvesters-wisdom | "  # gearset for the diablo 3 streamer j_macc
+                "Head 2: Quetzalcoatl http://eu.battle.net/d3/en/item/quetzalcoatl",
+        "ring": "Ring 1: Stone of Jordan http://us.battle.net/d3/en/item/stone-of-jordan | "
+                "Ring 2: Ring of Royal Grandeur http://us.battle.net/d3/en/item/ring-of-royal-grandeur-3qRFop",
+        "neck": "Neck: Golden Gorget of Leoric http://us.battle.net/d3/en/item/golden-gorget-of-leoric-1I0CCL",
+        "chest": "Chest: Helltooth Tunic http://us.battle.net/d3/en/item/helltooth-tunic",
+        "pants": "Pants: Jade Harvester's Courage http://us.battle.net/d3/en/item/jade-harvesters-courage",
+        "gloves": "Gloves: Jade Harvester's Mercy http://us.battle.net/d3/en/item/jade-harvesters-mercy",
+        "feet": "Feet: Jade Harvester's Swiftness http://us.battle.net/d3/en/item/jade-harvesters-swiftness",
+        "shoulders": "Shoulders: Jade Harvester's Joy http://us.battle.net/d3/en/item/jade-harvesters-joy"}
 
     def connect(self):
         self.irc = socket.socket()
@@ -118,7 +120,6 @@ class TwitchBot(IRCBot):
 print("==============\nSTART PROGRAM\n")
 #testBot = IRCBot("irc.geekshed.net", "#bottesting", 6667)
 #testBot.connect()
-
-twitchBot = TwitchBot("irc.twitch.tv", "#j_macc", 6667)
+twitchBot = TwitchBot("irc.twitch.tv", "#kingkongor", 6667)
 twitchBot.connect()
 print("END PROGRAM\n==============")
