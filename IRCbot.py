@@ -1,3 +1,4 @@
+#removed utf8 because of python 2.7
 __author__ = 'Jeroen'
 
 import socket
